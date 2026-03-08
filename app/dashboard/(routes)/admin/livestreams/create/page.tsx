@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ interface Course {
     title: string;
 }
 
-const AdminCreateLivestreamPage = () => {
+function AdminCreateLivestreamForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const courseIdFromUrl = searchParams.get("courseId");
@@ -191,6 +191,16 @@ const AdminCreateLivestreamPage = () => {
             </Card>
         </div>
     );
-};
+}
 
-export default AdminCreateLivestreamPage;
+export default function AdminCreateLivestreamPage() {
+    return (
+        <Suspense fallback={
+            <div className="p-6 flex items-center justify-center min-h-[200px]">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+            </div>
+        }>
+            <AdminCreateLivestreamForm />
+        </Suspense>
+    );
+}
