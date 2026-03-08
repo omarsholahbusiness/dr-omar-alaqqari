@@ -513,7 +513,7 @@ export default function HomePage() {
                 <Star className="h-6 w-6 text-brand" />
               </div>
               <h3 className="text-xl font-semibold mb-2">جودة عالية</h3>
-              <p className="text-muted-foreground">أفضل منصة لتعليم القرآن الكريم لجميع المراحل - الدراسات الإسلامية - علم النفس الدعوي - اللغة العربية</p>
+              <p className="text-muted-foreground">أفضل منصة لتعليم القرآن الكريم لجميع المراحل - الدراسات الإسلامية - علم النفس الدعوي - اللغة العربية - دورات تدريبية - معالجات نفسية</p>
             </motion.div>
 
             <motion.div
