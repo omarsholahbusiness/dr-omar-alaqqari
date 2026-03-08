@@ -7,7 +7,7 @@ export async function PUT(
     { params }: { params: Promise<{ courseId: string }> }
 ) {
     try {
-        const { userId } = await auth();
+        const { userId, user } = await auth();
         const resolvedParams = await params;
         const { list } = await req.json();
 
@@ -15,32 +15,38 @@ export async function PUT(
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const courseOwner = await db.course.findUnique({
-            where: {
-                id: resolvedParams.courseId,
-                userId: userId,
-            }
+        const course = await db.course.findUnique({
+            where: { id: resolvedParams.courseId },
+            select: { userId: true },
         });
 
-        if (!courseOwner) {
+        if (!course) {
+            return new NextResponse("Not Found", { status: 404 });
+        }
+
+        const isOwnerOrAdmin = user?.role === "ADMIN" || course.userId === userId;
+        if (!isOwnerOrAdmin) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        // Separate chapters and quizzes
-        const chapters = list.filter((item: any) => item.type === "chapter");
-        const quizzes = list.filter((item: any) => item.type === "quiz");
+        const chapters = list.filter((item: { type: string }) => item.type === "chapter");
+        const quizzes = list.filter((item: { type: string }) => item.type === "quiz");
+        const livestreams = list.filter((item: { type: string }) => item.type === "livestream");
 
-        // Update chapters
         for (const item of chapters) {
             await db.chapter.update({
                 where: { id: item.id },
                 data: { position: item.position }
             });
         }
-
-        // Update quizzes
         for (const item of quizzes) {
             await db.quiz.update({
+                where: { id: item.id },
+                data: { position: item.position }
+            });
+        }
+        for (const item of livestreams) {
+            await db.livestream.update({
                 where: { id: item.id },
                 data: { position: item.position }
             });

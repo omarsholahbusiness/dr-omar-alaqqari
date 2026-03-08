@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { CheckCircle, Circle } from "lucide-react";
+import { CheckCircle, Circle, Radio } from "lucide-react";
 import axios from "axios";
 import { cn } from "@/lib/utils";
 
@@ -31,8 +31,9 @@ interface CourseContent {
   id: string;
   title: string;
   position: number;
-  type: 'chapter' | 'quiz';
+  type: 'chapter' | 'quiz' | 'livestream';
   isFree?: boolean;
+  expiresAt?: string;
   userProgress?: {
     isCompleted: boolean;
   }[];
@@ -94,9 +95,10 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
   }, [fetchCourseData]);
 
   useEffect(() => {
-    // Update selected content based on current path
-    const currentContentId = pathname?.split("/").pop();
-    setSelectedContentId(currentContentId || null);
+    const segments = pathname?.split("/") ?? [];
+    const last = segments[segments.length - 1];
+    const isLivestream = pathname?.includes("/livestreams/");
+    setSelectedContentId(last || null);
   }, [pathname]);
 
   const onClick = (content: CourseContent) => {
@@ -107,6 +109,8 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
         router.push(`/courses/${courseId}/chapters/${content.id}`);
       } else if (content.type === 'quiz') {
         router.push(`/courses/${courseId}/quizzes/${content.id}`);
+      } else if (content.type === 'livestream') {
+        router.push(`/courses/${courseId}/livestreams/${content.id}`);
       }
       router.refresh();
     }
@@ -148,7 +152,11 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
           const isSelected = selectedContentId === content.id;
           const isCompleted = content.type === 'chapter' 
             ? content.userProgress?.[0]?.isCompleted || false
-            : content.quizResults && content.quizResults.length > 0;
+            : content.type === 'quiz'
+            ? !!(content.quizResults && content.quizResults.length > 0)
+            : false;
+          const isLivestream = content.type === 'livestream';
+          const livestreamExpired = isLivestream && content.expiresAt ? new Date(content.expiresAt) < new Date() : false;
           
           return (
             <div
@@ -158,11 +166,14 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
                 isSelected 
                   ? "bg-slate-200 text-slate-900"
                   : "text-slate-500 hover:bg-slate-300/20 hover:text-slate-600",
-                isCompleted && !isSelected && "text-emerald-600"
+                isCompleted && !isSelected && !isLivestream && "text-emerald-600",
+                isLivestream && livestreamExpired && "opacity-70"
               )}
               onClick={() => onClick(content)}
             >
-              {isCompleted ? (
+              {content.type === 'livestream' ? (
+                <Radio className={cn("h-4 w-4", livestreamExpired ? "text-muted-foreground" : "text-primary")} />
+              ) : isCompleted ? (
                 <CheckCircle className="h-4 w-4 text-emerald-600" />
               ) : (
                 <Circle className="h-4 w-4" />
@@ -171,6 +182,11 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
                 {content.title}
                 {content.type === 'quiz' && (
                   <span className="ml-2 text-xs text-green-600">(اختبار)</span>
+                )}
+                {content.type === 'livestream' && (
+                  <span className={cn("ml-2 text-xs", livestreamExpired ? "text-muted-foreground" : "text-primary")}>
+                    (بث مباشر)
+                  </span>
                 )}
               </span>
               {content.type === 'chapter' && content.isFree && (

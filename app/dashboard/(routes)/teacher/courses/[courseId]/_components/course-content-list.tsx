@@ -12,22 +12,25 @@ interface CourseItem {
     title: string;
     position: number;
     isPublished: boolean;
-    type: "chapter" | "quiz";
+    type: "chapter" | "quiz" | "livestream";
     isFree?: boolean; // Only for chapters
 }
 
 interface CourseContentListProps {
     items: CourseItem[];
-    onReorder: (updateData: { id: string; position: number; type: "chapter" | "quiz" }[]) => void;
-    onEdit: (id: string, type: "chapter" | "quiz") => void;
-    onDelete: (id: string, type: "chapter" | "quiz") => void;
+    onReorder: (updateData: { id: string; position: number; type: "chapter" | "quiz" | "livestream" }[]) => void;
+    onEdit: (id: string, type: "chapter" | "quiz" | "livestream") => void;
+    onDelete: (id: string, type: "chapter" | "quiz" | "livestream") => void;
 }
 
-const getActionLabel = (type: "chapter" | "quiz", isPublished: boolean) => {
+const getActionLabel = (type: "chapter" | "quiz" | "livestream", isPublished: boolean) => {
     if (type === "chapter") {
         return isPublished ? "تعديل فيديو" : "اضافة فيديو";
     }
-    return isPublished ? "تعديل اختبار" : "اضافة اختبار";
+    if (type === "quiz") {
+        return isPublished ? "تعديل اختبار" : "اضافة اختبار";
+    }
+    return "تعديل بث مباشر";
 };
 
 export const CourseContentList = ({
@@ -85,7 +88,7 @@ export const CourseContentList = ({
                                             <div className="flex items-center gap-x-2">
                                                 <span>{item.title}</span>
                                                 <Badge variant="outline" className="text-xs">
-                                                    {item.type === "chapter" ? "فصل" : "اختبار"}
+                                                    {item.type === "chapter" ? "فصل" : item.type === "quiz" ? "اختبار" : "بث مباشر"}
                                                 </Badge>
                                             </div>
                                         </div>

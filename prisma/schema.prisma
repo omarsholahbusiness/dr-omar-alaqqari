@@ -42,12 +42,30 @@ model Course {
 
   attachments Attachment[]
   chapters Chapter[]
+  livestreams Livestream[]
   purchases Purchase[]
   quizzes Quiz[]
   purchaseCodes PurchaseCode[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Livestream {
+  id          String   @id @default(uuid())
+  title       String   @db.Text
+  description String?  @db.Text
+  meetingLink String   @db.Text
+  scheduledAt DateTime
+  expiresAt   DateTime
+  position    Int
+  isPublished Boolean  @default(false)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId])
 }
 
 model Attachment {

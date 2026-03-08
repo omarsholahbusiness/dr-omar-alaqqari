@@ -109,5 +109,5 @@ export const authOptions: AuthOptions = {
       return token;
     },
   },
-  debug: process.env.NODE_ENV === "development",
+  debug: false, // Set to true only when debugging auth; avoids noisy JWT logs when cookie is stale
 }; 
