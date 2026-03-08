@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Users, BookOpen, Award, ChevronDown } from "lucide-react";
+import { ArrowRight, Star, Users, BookOpen, Award, ChevronDown, Facebook } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Navbar } from "@/components/navbar";
@@ -570,6 +570,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Floating Facebook Button - hidden on mobile/portrait, visible from md */}
+      <motion.a
+        href="https://www.facebook.com/share/16z4pDqTK8/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-24 right-6 z-50 w-16 h-16 rounded-full bg-[#1877F2] shadow-lg hover:shadow-xl transition-all hidden md:flex items-center justify-center group"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1, duration: 0.5 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        aria-label="فيسبوك"
+      >
+        <Facebook className="w-8 h-8 text-white" />
+      </motion.a>
       {/* Floating WhatsApp Button - hidden on mobile/portrait, visible from md (landscape/tablet+) */}
       <motion.a
         href="https://wa.me/201109161394"
